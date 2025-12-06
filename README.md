@@ -3,7 +3,7 @@
 A simple resume parser that extracts information from text.
 
 ## 🌐 Live Demo
-[https://resume-parser.onrender.com](https://resume-parser.onrender.com)
+[https://resume-parser.onrender.com](https://resume-parser-h8lo.onrender.com)
 
 ## ✨ Features
 - Extract emails and phone numbers
