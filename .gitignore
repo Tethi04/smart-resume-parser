@@ -1,0 +1,8 @@
+
+---
+
+## **📄 4. `.gitignore`**
+```gitignore
+__pycache__/
+*.pyc
+venv/
