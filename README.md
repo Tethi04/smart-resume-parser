@@ -1,17 +1,25 @@
-# Simple Resume Parser
+# ✅ Resume Parser - Working on Render
 
-A minimal resume parser that works on Render free tier.
+A simple resume parser that extracts information from text.
 
-## Live Demo
-[Your Render URL]
+## 🌐 Live Demo
+[https://resume-parser.onrender.com](https://resume-parser.onrender.com)
 
-## Features
-- Extract email addresses
-- Extract phone numbers
-- Detect common skills
-- Download results as JSON
+## ✨ Features
+- Extract emails and phone numbers
+- Detect skills automatically
+- Find education information
+- Identify work experience
+- Export as JSON or TXT
+- Sample resumes included
 
-## Local Run
+## 🚀 How to Use
+1. **Upload** a TXT file OR **Paste** resume text
+2. Click **"Parse Resume"**
+3. View extracted information
+4. Download results
+
+## 💻 Local Development
 ```bash
-pip install -r requirements.txt
+pip install streamlit==1.29.0
 streamlit run app.py
