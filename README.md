@@ -1,3 +1,4 @@
+
 # ✅ Resume Parser - Working on Render
 
 A simple resume parser that extracts information from text.
@@ -12,14 +13,15 @@ A simple resume parser that extracts information from text.
 - Identify work experience
 - Export as JSON or TXT
 - Sample resumes included
+- PDF file support
 
 ## 🚀 How to Use
-1. **Upload** a TXT file OR **Paste** resume text
+1. **Upload** a PDF or TXT file OR **Paste** resume text
 2. Click **"Parse Resume"**
 3. View extracted information
 4. Download results
 
 ## 💻 Local Development
 ```bash
-pip install streamlit==1.29.0
+pip install -r requirements.txt
 streamlit run app.py
