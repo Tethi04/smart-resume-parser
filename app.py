@@ -5,6 +5,8 @@ import json
 import base64
 from datetime import datetime
 from io import StringIO
+import PyPDF2
+import pdfplumber
 
 # Page configuration
 st.set_page_config(
@@ -42,20 +44,54 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+def extract_text_from_pdf(uploaded_file):
+    """Extract text from PDF file using multiple methods for reliability"""
+    text = ""
+    
+    try:
+        # Method 1: Try pdfplumber first (better for most PDFs)
+        with pdfplumber.open(uploaded_file) as pdf:
+            pages_text = []
+            for page in pdf.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    pages_text.append(page_text)
+            text = "\n".join(pages_text)
+        
+        # If pdfplumber returns empty or very little text, try PyPDF2
+        if not text or len(text.strip()) < 50:
+            uploaded_file.seek(0)  # Reset file pointer
+            
+            # Method 2: Try PyPDF2
+            pdf_reader = PyPDF2.PdfReader(uploaded_file)
+            pages_text = []
+            for page_num in range(len(pdf_reader.pages)):
+                page = pdf_reader.pages[page_num]
+                page_text = page.extract_text()
+                if page_text:
+                    pages_text.append(page_text)
+            text = "\n".join(pages_text)
+    
+    except Exception as e:
+        st.error(f"Error reading PDF: {str(e)}")
+        return None
+    
+    return text
+
 def main():
     # Header
     st.markdown('<h1 class="main-header">📄 Resume Parser</h1>', unsafe_allow_html=True)
     st.markdown("""
     <div style='background-color: #DBEAFE; padding: 1rem; border-radius: 0.5rem;'>
     <strong>✅ Extract information from resumes</strong><br>
-    Works with TXT files or pasted text
+    Works with PDF/TXT files or pasted text
     </div>
     """, unsafe_allow_html=True)
     
     # Sidebar
     with st.sidebar:
         st.markdown("### ⚙️ Options")
-        input_method = st.radio("Choose input method:", ["Upload TXT file", "Paste text"])
+        input_method = st.radio("Choose input method:", ["Upload File", "Paste text"])
         st.markdown("---")
         st.markdown("### ℹ️ About")
         st.info("""
@@ -64,6 +100,7 @@ def main():
         • Detect skills
         • Find education
         • Export as JSON
+        • Supports PDF and TXT files
         """)
         st.markdown("---")
         st.markdown("**Deployed on Render** ✅")
@@ -76,20 +113,32 @@ def main():
         
         resume_text = ""
         
-        if input_method == "Upload TXT file":
-            uploaded_file = st.file_uploader("Choose a TXT file", type=["txt"])
+        if input_method == "Upload File":
+            uploaded_file = st.file_uploader("Choose a PDF or TXT file", type=["pdf", "txt"])
             if uploaded_file is not None:
                 try:
-                    # Try UTF-8 first
-                    resume_text = uploaded_file.read().decode("utf-8")
-                except:
-                    # Fallback to latin-1
-                    uploaded_file.seek(0)
-                    resume_text = uploaded_file.read().decode("latin-1")
+                    if uploaded_file.name.lower().endswith('.pdf'):
+                        with st.spinner("Extracting text from PDF..."):
+                            resume_text = extract_text_from_pdf(uploaded_file)
+                            if resume_text:
+                                st.success(f"✅ PDF loaded: {uploaded_file.name}")
+                                st.text_area("Preview (first 500 chars):", resume_text[:500], height=150)
+                            else:
+                                st.error("Could not extract text from PDF. Please try another file.")
+                    else:  # TXT file
+                        # Try UTF-8 first
+                        resume_text = uploaded_file.read().decode("utf-8")
+                        # Fallback to latin-1 if UTF-8 fails
+                        if not resume_text.strip():
+                            uploaded_file.seek(0)
+                            resume_text = uploaded_file.read().decode("latin-1")
+                        
+                        if resume_text:
+                            st.success(f"✅ TXT file loaded: {uploaded_file.name}")
+                            st.text_area("Preview (first 500 chars):", resume_text[:500], height=150)
                 
-                if resume_text:
-                    st.success(f"✅ File loaded: {uploaded_file.name}")
-                    st.text_area("Preview (first 500 chars):", resume_text[:500], height=150)
+                except Exception as e:
+                    st.error(f"Error reading file: {str(e)}")
         
         else:  # Paste text
             resume_text = st.text_area("Paste your resume text:", height=300, 
@@ -408,3 +457,4 @@ EDUCATION:
 
 if __name__ == "__main__":
     main()
+[file content end]
