@@ -5,7 +5,7 @@ import json
 import base64
 from datetime import datetime
 from io import StringIO
-import PyPDF2
+from pypdf import PdfReader
 import pdfplumber
 
 # Page configuration
@@ -63,7 +63,7 @@ def extract_text_from_pdf(uploaded_file):
             uploaded_file.seek(0)  # Reset file pointer
             
             # Method 2: Try PyPDF2
-            pdf_reader = PyPDF2.PdfReader(uploaded_file)
+            pdf_reader = PdfReader(uploaded_file)
             pages_text = []
             for page_num in range(len(pdf_reader.pages)):
                 page = pdf_reader.pages[page_num]
